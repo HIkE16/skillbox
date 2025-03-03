@@ -1,0 +1,32 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+    - '**'
+  pull_request:
+
+jobs:
+  lint:
+    name: Run linters
+    runs-on: ubuntu-latest
+    container: python:3.12
+  
+    steps:
+        - name: Checkout репозитория
+          uses: actions/checkout@v4
+        - name: Установка зависимостей
+          run: |
+            pip install -r requirements.txt --no-cache-dir
+        
+        - name: Запуск Black
+          run: black --check --diff .
+  
+        - name: Запуск isort
+          run: isort --check-only --diff .
+
+        - name: mypy
+          run: mypy .
+
+        - name: flake8
+          run: flake8 .
