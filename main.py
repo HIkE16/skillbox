@@ -12,6 +12,7 @@ async def startup():
     async with engine.begin() as conn:
         await conn.run_sync(models.Base.metadata.create_all)
 
+
 @app.on_event('shutdown')
 async def shutdown():
     await session.close()
