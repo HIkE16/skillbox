@@ -7,16 +7,17 @@ from sqlalchemy.future import select
 app = FastAPI()
 
 
-@app.on_event('startup')
+@app.on_event("startup")
 async def startup():
     async with engine.begin() as conn:
         await conn.run_sync(models.Base.metadata.create_all)
 
 
-@app.on_event('shutdown')
+@app.on_event("shutdown")
 async def shutdown():
     await session.close()
     await engine.dispose()
+
 
 @app.post("/recipes", response_model=schemas.RecipeOut)
 async def recipe_post(recipe: schemas.RecipeIn) -> models.Recipe:
@@ -34,15 +35,19 @@ async def recipe_post(recipe: schemas.RecipeIn) -> models.Recipe:
         session.add(new_recipe)
     return new_recipe
 
+
 @app.get("/recipe", response_model=list[schemas.RecipeAll])
 async def recipe_get() -> list[models.Recipe]:
     """
     Сервис возвращает список рецептов с БД
-    
     """
-    res = await session.execute(select(models.Recipe).order_by(
-        models.Recipe.count.desc(), models.Recipe.coocking_time.desc()))
+    res = await session.execute(
+        select(models.Recipe).order_by(
+            models.Recipe.count.desc(), models.Recipe.coocking_time.desc()
+        )
+    )
     return res.scalars().all()
+
 
 @app.get("/recipes/{id}", response_model=schemas.RecipeId)
 async def recipe_get(id: int) -> models.Recipe:
@@ -52,7 +57,7 @@ async def recipe_get(id: int) -> models.Recipe:
     :params:
     - **id: int** ID - рецепта
     """
-    res = await session.execute(select(models.Recipe).where(models.Recipe.id==id))
+    res = await session.execute(select(models.Recipe).where(models.Recipe.id == id))
     result = res.scalars().one_or_none()
     if result is not None:
         result.count += 1
