@@ -1,11 +1,16 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, Integer, String
+
 from databases import Base
 
 
 class Recipe(Base):
-    __tablename__ = 'recipe'
+    __tablename__ = "recipe"
 
-    id = Column(Integer, primary_key=True, autoincrement=True, )
+    id = Column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
     title = Column(String, index=True, nullable=False)
     ingredients = Column(String, index=True)
     desc = Column(String, index=True)
