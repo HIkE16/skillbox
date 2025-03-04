@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from sqlalchemy import update
 from sqlalchemy.future import select
 
 import models
@@ -37,7 +38,7 @@ async def recipe_post(recipe: schemas.RecipeIn) -> models.Recipe:
     return new_recipe
 
 
-@app.get("/recipe", response_model=list[schemas.RecipeAll])
+@app.get("/recipes", response_model=list[schemas.RecipeAll])
 async def recipe_get() -> list[models.Recipe]:
     """
     Сервис возвращает список рецептов с БД
@@ -47,11 +48,11 @@ async def recipe_get() -> list[models.Recipe]:
             models.Recipe.count.desc(), models.Recipe.coocking_time.desc()
         )
     )
-    return res.scalars().all()
+    return list(res.scalars().all())
 
 
 @app.get("/recipes/{id}", response_model=schemas.RecipeId)
-async def recipe_get_by_id(id: int) -> models.Recipe:
+async def recipe_get_by_id(id: int):
     """
     Сервис возвращает рецепт с БД по ID
 
@@ -61,6 +62,10 @@ async def recipe_get_by_id(id: int) -> models.Recipe:
     res = await session.execute(select(models.Recipe).where(models.Recipe.id == id))
     result = res.scalars().one_or_none()
     if result is not None:
-        result.count += 1
-        await session.commit()
+        await session.execute(
+            update(models.Recipe)
+            .where(models.Recipe.id == id)
+            .values(count=result.count + 1)
+        )
         return result
+    return {"error": "Рецепт не найден"}
