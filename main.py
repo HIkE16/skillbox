@@ -1,8 +1,9 @@
 from fastapi import FastAPI
-from databases import engine, session
+from sqlalchemy.future import select
+
 import models
 import schemas
-from sqlalchemy.future import select
+from databases import engine, session
 
 app = FastAPI()
 
