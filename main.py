@@ -59,7 +59,10 @@ async def recipe_get_by_id(id: int):
     :params:
     - **id: int** ID - рецепта
     """
-    res = await session.execute(select(models.Recipe).where(models.Recipe.id == id))
+    res = await session.execute(
+        select(models.Recipe)
+        .where(models.Recipe.id == id)
+    )
     result = res.scalars().one_or_none()
     if result is not None:
         await session.execute(
