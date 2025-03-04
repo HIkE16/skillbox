@@ -51,7 +51,7 @@ async def recipe_get() -> list[models.Recipe]:
 
 
 @app.get("/recipes/{id}", response_model=schemas.RecipeId)
-async def recipe_get(id: int) -> models.Recipe:
+async def recipe_get_by_id(id: int) -> models.Recipe:
     """
     Сервис возвращает рецепт с БД по ID
 
